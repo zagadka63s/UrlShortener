@@ -117,3 +117,12 @@ dotnet run
 * Jwt section: Issuer, Audience, Key
 
 * SPA: src/app/core/auth.interceptor.ts attaches Bearer token to /api/*.
+
+* ### Screenshots
+
+**UI (Angular)**
+![UI screenshot](1.png)
+
+**Swagger**
+![Swagger screenshot](2.png)
+
