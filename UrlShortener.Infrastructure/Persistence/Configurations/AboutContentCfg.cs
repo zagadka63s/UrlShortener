@@ -4,6 +4,9 @@ using UrlShortener.Domain.Entities;
 
 namespace UrlShortener.Infrastructure.Persistence.Configurations;
 
+/// <summary>
+/// Configuration for AboutContent entity
+/// </summary>
 public class AboutContentCfg : IEntityTypeConfiguration<AboutContent>
 {
     public void Configure(EntityTypeBuilder<AboutContent> e)

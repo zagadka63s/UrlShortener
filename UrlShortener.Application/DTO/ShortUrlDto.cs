@@ -9,4 +9,6 @@ public class ShortUrlDto
     public string OriginalUrl { get; set; } = null!;
     public string ShortCode { get; set; } = null!;
     public DateTime CreatedAt { get; set; }
+
+    public string CreatedByUserId { get; set; } = default!;
 }

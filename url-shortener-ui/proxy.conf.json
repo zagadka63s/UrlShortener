@@ -1,0 +1,21 @@
+{
+  "/api": {
+    "target": "https://localhost:7055",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/r": {
+    "target": "https://localhost:7055",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "info"
+  },
+  "/hubs": {
+    "target": "https://localhost:7055",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "logLevel": "info"
+  }
+}

@@ -4,6 +4,9 @@ using UrlShortener.Domain.Entities;
 
 namespace UrlShortener.Infrastructure.Persistence.Configurations;
 
+/// <summary>
+/// Configuration for ShortUrl entity
+/// </summary>
 public class ShortUrlCfg : IEntityTypeConfiguration<ShortUrl>
 {
     public void Configure(EntityTypeBuilder<ShortUrl> e)
@@ -19,7 +22,7 @@ public class ShortUrlCfg : IEntityTypeConfiguration<ShortUrl>
         e.HasIndex(x => x.NormalizedOriginalUrl).IsUnique();
 
         e.Property(x => x.CreatedAt).HasConversion(
-            v => v,               // уже в UTC
+            v => v,               
             v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
     }
 }

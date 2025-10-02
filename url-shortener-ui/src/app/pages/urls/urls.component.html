@@ -1,0 +1,100 @@
+<h2>URL Shortener</h2>
+
+<div class="panel">
+  <h3>Auth</h3>
+
+  <div *ngIf="!loggedIn(); else loggedBlock">
+    <label>Email:
+      <input [(ngModel)]="email" autocomplete="username" />
+    </label>
+    <label>Password:
+      <input [(ngModel)]="password" type="password" autocomplete="current-password" />
+    </label>
+    <button (click)="login()" [disabled]="busy || !email || !password">Login</button>
+  </div>
+
+  <ng-template #loggedBlock>
+    Logged in
+    <button (click)="logout()" [disabled]="busy">Logout</button>
+  </ng-template>
+</div>
+
+<div class="panel" *ngIf="loggedIn()">
+  <h3>Create short URL</h3>
+  <input placeholder="https://..." [(ngModel)]="newUrl" style="width: 420px" />
+  <button (click)="create()" [disabled]="busy || !newUrl || isUrlInvalid()">Create</button>
+
+  <div class="hint" *ngIf="newUrl && !newUrl.startsWith('http')">
+    Подсказка: укажи протокол, например <code>https://</code>
+  </div>
+  <p class="error" *ngIf="newUrl && isUrlInvalid()">Некорректный URL</p>
+</div>
+
+<div class="panel">
+  <h3>Short URLs</h3>
+
+ 
+  <div class="mt-8" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+    <input [(ngModel)]="q" placeholder="Search by original or short code…" style="max-width:340px" />
+    <button (click)="onSearch()" [disabled]="busy">Search</button>
+
+    <span class="hint">Page size:</span>
+    <select [(ngModel)]="pageSize" (change)="page = 1; load()">
+      <option [ngValue]="5">5</option>
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="20">20</option>
+      <option [ngValue]="50">50</option>
+    </select>
+
+    <button (click)="load()" [disabled]="busy">Reload</button>
+
+    <span class="hint" *ngIf="total"> | {{ (page - 1) * pageSize + 1 }}–{{ Math.min(page * pageSize, total) }} of {{ total }}</span>
+  </div>
+
+  
+  <table class="mt-12">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Original</th>
+        <th>Short</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let u of urls">
+        <td>{{ u.id }}</td>
+
+        <td>
+          <a [href]="u.originalUrl" target="_blank" rel="noopener">{{ u.originalUrl }}</a>
+        </td>
+
+        <td>
+          <a [href]="shortLink(u.shortCode)" target="_blank" rel="noopener">/r/{{ u.shortCode }}</a>
+          <button (click)="copyShort(u.shortCode)" title="Copy short link" [disabled]="busy">Copy</button>
+        </td>
+
+        <td>{{ u.createdAt | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+
+        <td class="actions">
+          <a *ngIf="loggedIn()" [routerLink]="['/urls', u.id]">Details</a>
+          <button *ngIf="loggedIn() && canDelete(u)" (click)="remove(u.id)" [disabled]="busy">Delete</button>
+        </td>
+      </tr>
+      <tr *ngIf="!busy && urls.length === 0">
+        <td colspan="5" class="hint">No results</td>
+      </tr>
+    </tbody>
+  </table>
+
+  
+  <div class="mt-12" style="display:flex; gap:8px; align-items:center;">
+    <button (click)="prevPage()" [disabled]="busy || !canPrev()">Prev</button>
+    <span>Page {{ page }} / {{ totalPages() }}</span>
+    <button (click)="nextPage()" [disabled]="busy || !canNext()">Next</button>
+  </div>
+</div>
+
+<p class="error" *ngIf="error">{{ error }}</p>

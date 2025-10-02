@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace UrlShortener.Infrastructure.Identity;
 
-// Расширяем при необходимости (Phone, FullName и т.д.)
+
 public class ApplicationUser : IdentityUser
 {
 }

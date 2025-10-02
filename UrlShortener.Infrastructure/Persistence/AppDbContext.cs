@@ -4,7 +4,9 @@ using UrlShortener.Domain.Entities;
 using UrlShortener.Infrastructure.Identity;
 
 namespace UrlShortener.Infrastructure.Persistence;
-
+/// <summary>
+/// Application database context
+/// </summary>
 public class AppDbContext : IdentityDbContext<ApplicationUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }

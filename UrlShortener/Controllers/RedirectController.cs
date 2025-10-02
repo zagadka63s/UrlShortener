@@ -4,7 +4,9 @@ using UrlShortener.Infrastructure.Persistence;
 
 namespace UrlShortener.Controllers;
 
-[ApiController]
+/// <summary>
+/// controller to handle redirection from short URL to original URL
+/// </summary>
 [Route("r")]
 public class RedirectController : ControllerBase
 {
@@ -23,7 +25,7 @@ public class RedirectController : ControllerBase
 
         if (target is null) return NotFound();
 
-        // 302 temporary redirect 
+        
         return Redirect(target);
     }
 }

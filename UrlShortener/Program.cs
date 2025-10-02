@@ -13,6 +13,17 @@ using UrlShortener.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+///<summary>
+/// CORS for SPA (Angular http://localhost:4200)
+///</summary>
+builder.Services.AddCors(opt =>
+    opt.AddPolicy("spa", p => p
+        .WithOrigins("http://localhost:4200")
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials())
+);
+
 // ----- JWT config -----
 var jwt = builder.Configuration.GetSection("Jwt");
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
@@ -30,7 +41,7 @@ builder.Services
             ValidIssuer = jwt["Issuer"],
             ValidAudience = jwt["Audience"],
             IssuerSigningKey = signingKey,
-            ClockSkew = TimeSpan.Zero // 
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -39,32 +50,26 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
 });
 
-/// <summary>
-/// Razor Pages (for admin UI later)
-/// </summary>
+
 builder.Services.AddRazorPages();
 
-
-/// <summary>
-/// DbContext (SQLite) 
-/// </summary>
+// DbContext (SQLite)
 builder.Services.AddDbContext<AppDbContext>(opt =>
-    opt.UseSqlite(builder.Configuration.GetConnectionString("Default")));
+    opt.UseSqlite(builder.Configuration.GetConnectionString("Default"))
+);
 
-/// <summary>
-/// Identity (users + roles)
-/// </summary>
+// Identity
 builder.Services
     .AddIdentityCore<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
 
-// ----- DI: infrastructure/application services -----
+
 builder.Services.AddScoped<DbSeeder>();
 builder.Services.AddScoped<IUrlNormalizer, UrlNormalizer>();
 builder.Services.AddScoped<IShortCodeGenerator, ShortCodeGenerator>();
 
-// ----- Controllers + Swagger -----
+
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -72,26 +77,26 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "UrlShortener API", Version = "v1" });
 
-    var scheme = new OpenApiSecurityScheme
+    var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
+        Description = "JWT Authorization header using the Bearer scheme",
+        In = ParameterLocation.Header,
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter: Bearer {your JWT}"
+        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
     };
 
-    c.AddSecurityDefinition("Bearer", scheme);
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        [scheme] = new List<string>()
-    });
+    c.AddSecurityDefinition("Bearer", securityScheme);
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement { { securityScheme, Array.Empty<string>() } });
 });
+
+// -------- SignalR: registering before Build() --------
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
-// ----- Pipeline -----
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -100,13 +105,19 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
+app.UseCors("spa");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 app.MapRazorPages();
 
-// ----- Initial DB seed (migrations, Admin role/user, default About) -----
+// -------- Hub route --------
+app.MapHub<UrlShortener.RealTime.UrlsHub>("/hubs/urls");
+
+
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();

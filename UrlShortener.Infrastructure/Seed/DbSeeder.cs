@@ -32,14 +32,14 @@ public class DbSeeder
     /// </summary>
     public async Task SeedAsync()
     {
-        // Ensure database is up to date.
+        // 
         await _db.Database.MigrateAsync();
 
         const string adminRole = "Admin";
         const string adminEmail = "admin@example.com";
-        const string adminPassword = "Admin#12345"; // dev-only; move to secrets in real deployments
+        const string adminPassword = "Admin#12345"; 
 
-        // Ensure Admin role exists.
+        // ensure Admin role exists.
         if (!await _roleManager.RoleExistsAsync(adminRole))
         {
             var roleResult = await _roleManager.CreateAsync(new IdentityRole(adminRole));
@@ -47,7 +47,7 @@ public class DbSeeder
                 throw new InvalidOperationException($"Failed to create role '{adminRole}': {string.Join(", ", roleResult.Errors.Select(e => e.Description))}");
         }
 
-        // Ensure admin user exists and is in the Admin role.
+        // ensure admin user exists and is in the Admin role.
         var admin = await _userManager.FindByEmailAsync(adminEmail);
         if (admin is null)
         {
@@ -68,7 +68,7 @@ public class DbSeeder
         }
         else
         {
-            // Ensure the existing user is in the Admin role.
+            // ensure the existing user is in the Admin role.
             if (!await _userManager.IsInRoleAsync(admin, adminRole))
             {
                 var addToRoleResult = await _userManager.AddToRoleAsync(admin, adminRole);
@@ -77,7 +77,7 @@ public class DbSeeder
             }
         }
 
-        // Seed a single About record if missing.
+        // seed About content if none exists
         if (!await _db.AboutContents.AnyAsync())
         {
             _db.AboutContents.Add(new AboutContent

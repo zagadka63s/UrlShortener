@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace UrlShortener.Application.DTO
+/// <summary>
+/// DTO for the "About" page content.
+/// </summary>
 {
     public class AboutDto
     {

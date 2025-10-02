@@ -1,0 +1,15 @@
+<div class="container" style="padding:16px">
+  <a routerLink="/urls">← Back</a>
+
+  <h2>Short URL Info</h2>
+
+  <ng-container *ngIf="loading">Loading…</ng-container>
+  <ng-container *ngIf="!loading && error">{{ error }}</ng-container>
+
+  <ng-container *ngIf="!loading && !error && item">
+    <p><b>ID:</b> {{ item.id }}</p>
+    <p><b>Original:</b> <a [href]="item.originalUrl" target="_blank" rel="noopener">{{ item.originalUrl }}</a></p>
+    <p><b>Short:</b> <a [href]="'/r/' + item.shortCode" target="_blank" rel="noopener">/r/{{ item.shortCode }}</a></p>
+    <p><b>Created:</b> {{ item.createdAt | date:'medium' }}</p>
+  </ng-container>
+</div>
